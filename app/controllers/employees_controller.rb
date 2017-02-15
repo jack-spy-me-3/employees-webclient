@@ -1,13 +1,22 @@
 class EmployeesController < ApplicationController
+
+  HEADER = { "Accept" => "application/json",
+             "X-User-Email" => ENV['API_EMAIL'],
+             "Authorization" => "Token token=#{ENV['API_KEY']}"}
+  def index
+    @employees = Unirest.get("#{ENV['API_URL']}employees",
+                headers: HEADER,
+                ).body
+    render "index.html.erb"
+  end
+
   def show
-    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}").body
+    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}",
+                headers: HEADER,
+                ).body
     render "show.html.erb"
   end
 
-  def index
-    @employees = Unirest.get("#{ENV['API_URL']}employees").body
-    render "index.html.erb"
-  end
 
   def new
     render "new.html.erb"
@@ -15,7 +24,7 @@ class EmployeesController < ApplicationController
 
   def create
     employee = Unirest.post("#{ENV['API_URL']}employees",
-                     headers:{ "Accept" => "application/json" }, 
+                     headers: HEADER, 
                      parameters:{ first_name: params[:form_first_name],
                                   last_name: params[:form_last_name],
                                   email: params[:form_email] }
@@ -24,13 +33,13 @@ class EmployeesController < ApplicationController
   end
 
   def edit
-    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}").body
+    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}", headers: HEADER).body
     render "edit.html.erb"
   end
 
   def update
     @employee = Unirest.patch("#{ENV['API_URL']}employees/#{params[:id]}",
-                     headers:{ "Accept" => "application/json" }, 
+                     headers: HEADER, 
                      parameters:{ first_name: params[:first_name],
                                   last_name: params[:last_name],
                                   email: params[:email] }
@@ -39,7 +48,7 @@ class EmployeesController < ApplicationController
   end
 
   def destroy
-    Unirest.delete("#{ENV['API_URL']}employees/#{params[:id]}").body
+    Unirest.delete("#{ENV['API_URL']}employees/#{params[:id]}", headers: HEADER).body
     redirect_to "/employees"
   end
 end
