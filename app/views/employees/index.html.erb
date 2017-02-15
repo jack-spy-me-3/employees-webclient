@@ -1,6 +1,6 @@
 <h1>Employees</h1>
 <% @employees.each do |employee| %>
-<p><%= employee["first_name"] %></p>
-<p><%= employee["last_name"] %></p>
+<p><%= employee.full_name %></p>
+<p><%= employee.email %></p>
 <hr>
 <% end %>

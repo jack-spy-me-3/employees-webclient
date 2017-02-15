@@ -4,51 +4,41 @@ class EmployeesController < ApplicationController
              "X-User-Email" => ENV['API_EMAIL'],
              "Authorization" => "Token token=#{ENV['API_KEY']}"}
   def index
-    @employees = Unirest.get("#{ENV['API_URL']}employees",
-                headers: HEADER,
-                ).body
-    render "index.html.erb"
+    @employees = Employee.all
+    render :index
+    # render "index.html.erb"
   end
 
   def show
-    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}",
-                headers: HEADER,
-                ).body
-    render "show.html.erb"
+    @employee = Employee.find_by(id: params[:id])
+    render :show
   end
 
-
   def new
-    render "new.html.erb"
+    render :new
   end
 
   def create
-    employee = Unirest.post("#{ENV['API_URL']}employees",
-                     headers: HEADER, 
-                     parameters:{ first_name: params[:form_first_name],
-                                  last_name: params[:form_last_name],
-                                  email: params[:form_email] }
-                          ).body
-    redirect_to "/employees/#{employee['id']}"
+    # employee = Employee.new
+    # employee.save
+    employee = Employee.create(first_name: params[:first_name], last_name: params[:last_name], email: params[:email])
+    redirect_to employee_path(employee.id)
   end
 
   def edit
-    @employee = Unirest.get("#{ENV['API_URL']}employees/#{params[:id]}", headers: HEADER).body
-    render "edit.html.erb"
+    @employee = Employee.find_by(id: params[:id])
+    render :edit
   end
 
   def update
-    @employee = Unirest.patch("#{ENV['API_URL']}employees/#{params[:id]}",
-                     headers: HEADER, 
-                     parameters:{ first_name: params[:first_name],
-                                  last_name: params[:last_name],
-                                  email: params[:email] }
-                          ).body
-    redirect_to "/employees/#{@employee['id']}"
+    @employee = Employee.find_by(id: params[:id])
+    @employee.update(first_name: params[:first_name], last_name: params[:last_name], email: params[:email])
+    redirect_to employee_path(@employee.id)
   end
 
   def destroy
-    Unirest.delete("#{ENV['API_URL']}employees/#{params[:id]}", headers: HEADER).body
-    redirect_to "/employees"
+    employee = Employee.find_by(id: params[:id])
+    employee.destroy
+    redirect_to employees_path
   end
 end
